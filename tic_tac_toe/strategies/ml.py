@@ -3,7 +3,7 @@
 #   tic_tac_toe/strategies/ml.py
 from operator import itemgetter
 
-from tic_tac_toe.core import get_free_cells, get_lines, last_move_has_won
+from tic_tac_toe.core import get_possible_moves, get_lines, last_move_has_won
 from tic_tac_toe.types import Board, Cell, Cells, Lines
 from tic_tac_toe.util import cached, select_random_cell
 
@@ -22,7 +22,7 @@ def count_free_lines(lines: Lines, moves: Cells) -> int:
 
 @cached
 def get_costs(board: Board) -> (Cell, int):
-    return tuple((move, cost_function(board, move)) for move in get_free_cells(board))
+    return tuple((move, cost_function(board, move)) for move in get_possible_moves(board))
 
 
 @cached
@@ -32,12 +32,12 @@ def get_cost_optimal_moves(board: Board) -> Cells:
 
 @cached
 def get_defensive_moves(board: Board) -> Cells:
-    return tuple(c for c in get_free_cells(board) if last_move_has_won(Board(board.size, board.moves + ((), c))))
+    return tuple(c for c in get_possible_moves(board) if last_move_has_won(Board(board.size, board.moves + ((), c))))
 
 
 @cached
 def get_winning_moves(board) -> Cells:
-    return tuple(c for c in get_free_cells(board) if last_move_has_won(Board(board.size, board.moves + (c,))))
+    return tuple(c for c in get_possible_moves(board) if last_move_has_won(Board(board.size, board.moves + (c,))))
 
 
 def strategy(board: Board) -> Cell:

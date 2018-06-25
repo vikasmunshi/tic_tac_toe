@@ -6,7 +6,7 @@ from itertools import permutations
 from json import dump, load
 from os.path import abspath, exists, splitext
 
-from tic_tac_toe.core import get_cells, get_free_cells, last_move_has_won
+from tic_tac_toe.core import get_cells, get_possible_moves, last_move_has_won
 from tic_tac_toe.memory import recollect, remember
 from tic_tac_toe.types import Board, Cell, Cells, Game, Games
 from tic_tac_toe.util import cached, select_random_cell
@@ -25,7 +25,8 @@ def memorize_games(size: int) -> None:
     cache_file = abspath(splitext(__file__)[0] + '.{}.json'.format(size))
     if exists(cache_file):
         with open(cache_file, 'r') as infile:
-            for g in load(infile): remember(game=Game(moves=tuple(Cell(*c) for c in g[0]), result=g[1]))
+            for g in load(infile):
+                remember(game=Game(moves=tuple(Cell(*c) for c in g[0]), result=g[1]))
     elif size < 4:
         for game in (reduce_board(Board(size, moves)) for moves in permutations(get_cells(Board(size=size, moves=())))):
             remember(game=game)
@@ -45,7 +46,8 @@ def normalize_result(game: Game, player: int) -> int:
 def remembered_best_moves(games: Games, move_num: int) -> Cells:
     scores = {}
     for next_move, winner in ((g.moves[move_num], g.result) for g in games):
-        if next_move not in scores: scores[next_move] = {'W': 0, 'L': 0, 'D': 0}
+        if next_move not in scores:
+            scores[next_move] = {'W': 0, 'L': 0, 'D': 0}
         bucket = 'D' if winner == 'D' else 'W' if winner == ('X', 'O')[move_num % 2] else 'L'
         m = scores[next_move]
         m[bucket] += 1
@@ -62,4 +64,4 @@ def suggest_moves(board) -> Cells:
 
 
 def strategy(board: Board) -> Cell:
-    return select_random_cell(suggest_moves(board) or get_free_cells(board))
+    return select_random_cell(suggest_moves(board) or get_possible_moves(board))

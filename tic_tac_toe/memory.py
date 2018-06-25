@@ -13,7 +13,8 @@ def recollect(moves: Moves) -> Games:
 
 def remember(game: Game) -> None:
     global cache
-    if game.result in ('D', 'O', 'X'): cache.add(game)
+    if game.result in ('D', 'O', 'X'):
+        cache.add(game)
 
 
 def remembered(func: TypeFuncBoard) -> TypeFuncBoard:

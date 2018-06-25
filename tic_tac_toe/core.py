@@ -14,7 +14,7 @@ def add_move_to_board(board: Board, move: Cell) -> Board:
 
 @cached
 def board_is_full(board: Board) -> bool:
-    return not get_free_cells(board)
+    return not get_possible_moves(board)
 
 
 @cached
@@ -45,13 +45,13 @@ def get_diagonals(board: Board) -> Lines:
 
 
 @cached
-def get_free_cells(board: Board) -> Cells:
-    return tuple(cell for cell in get_cells(board) if cell not in board.moves)
+def get_lines(board: Board) -> Lines:
+    return get_rows(board) + get_columns(board) + get_diagonals(board)
 
 
 @cached
-def get_lines(board: Board) -> Lines:
-    return get_rows(board) + get_columns(board) + get_diagonals(board)
+def get_possible_moves(board: Board) -> Cells:
+    return tuple(cell for cell in get_cells(board) if cell not in board.moves)
 
 
 @cached
@@ -71,7 +71,7 @@ def last_move_has_won(board: Board) -> bool:
 
 def play(board: Board, one: Player, two: Player) -> str:
     move = one.strategy(board)
-    if move not in get_free_cells(board):
+    if move not in get_possible_moves(board):
         return 'I.{}'.format(one.name)
     return check_winner(add_move_to_board(board, move)) or play(add_move_to_board(board, move), two, one)
 
@@ -93,4 +93,4 @@ def play_game_set(size: int, one: Player, two: Player) -> (str, str):
 
 
 def strategy(board: Board) -> Cell:
-    return select_random_cell(get_free_cells(board))
+    return select_random_cell(get_possible_moves(board))
