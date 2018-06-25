@@ -8,7 +8,7 @@ from os.path import abspath, exists, splitext
 
 from tic_tac_toe.core import get_cells, get_free_cells, last_move_has_won
 from tic_tac_toe.memory import recollect, remember
-from tic_tac_toe.types import Board, Cell, Cells, Game
+from tic_tac_toe.types import Board, Cell, Cells, Game, Games
 from tic_tac_toe.util import cached, select_random_cell
 
 
@@ -42,20 +42,23 @@ def normalize_result(game: Game, player: int) -> int:
 
 
 @cached
-def suggest_moves(board) -> Cells:
-    memorize_games(board.size)
-    num_moves = len(board.moves)
+def remembered_best_moves(games: Games, move_num: int) -> Cells:
     scores = {}
-    for next_move, winner in ((g.moves[num_moves], g.result) for g in recollect(board.moves)):
+    for next_move, winner in ((g.moves[move_num], g.result) for g in games):
         if next_move not in scores: scores[next_move] = {'W': 0, 'L': 0, 'D': 0}
-        bucket = 'D' if winner == 'D' else 'W' if winner == ('X', 'O')[num_moves % 2] else 'L'
+        bucket = 'D' if winner == 'D' else 'W' if winner == ('X', 'O')[move_num % 2] else 'L'
         m = scores[next_move]
         m[bucket] += 1
-        m['S'] = int(1000 * (m['W'] + m['D'] * (num_moves % 2) - m['L']) / (m['W'] + m['D'] + m['L']))
+        m['S'] = int(1000 * (m['W'] + m['D'] * (move_num % 2) - m['L']) / (m['W'] + m['D'] + m['L']))
     if scores:
         max_score = max(scores.items(), key=lambda x: x[1]['S'])[1]['S']
         return tuple(m[0] for m in scores.items() if m[1]['S'] == max_score)
     return ()
+
+
+def suggest_moves(board) -> Cells:
+    memorize_games(board.size)
+    return remembered_best_moves(recollect(board.moves), len(board.moves))
 
 
 def strategy(board: Board) -> Cell:
