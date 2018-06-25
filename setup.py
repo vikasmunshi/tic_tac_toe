@@ -8,7 +8,7 @@ setup(
         version='1.4.1',
         author='Vikas Munshi',
         author_email='vikas.munshi@gmail.com',
-        url='https://github.com/vikasmunshi/python-scripts.git',
+        url='https://github.com/vikasmunshi/tic_tac_toe.git',
         description='Tic Tac Toe Tornament',
         packages=['tic_tac_toe', 'tic_tac_toe.strategies'],
         package_dir={'tic_tac_toe': 'tic_tac_toe'},

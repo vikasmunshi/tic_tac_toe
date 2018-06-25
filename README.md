@@ -5,9 +5,6 @@ Play a tournament of tic-tac-toe
 ## Install:
 
     pip3 install -e git+https://github.com/vikasmunshi/tic_tac_toe.git#egg=akira
-    or
-    git clone https://github.com/vikasmunshi/tic_tac_toe.git
-    pip3 install -e tic_tac_toe
     
 ## Unistall:
 
