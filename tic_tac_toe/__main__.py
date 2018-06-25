@@ -55,10 +55,10 @@ def main() -> str:
     strategies_folder = args.strategies_folder or path.join(path.dirname(__file__), 'strategies')
     if args.tournament_type == 'fight':
         winners = play_tournament_eliminate(
-                size=args.board_size,
-                num_games=args.games,
-                players=tuple(load_players(strategies_folder, args.include_bad, args.py2)),
-                round_num=0
+            size=args.board_size,
+            num_games=args.games,
+            players=tuple(load_players(strategies_folder, args.include_bad, args.py2)),
+            round_num=0
         )
         return (
             'Winner is {}\n'.format(winners[0].name) if len(winners) == 1 else
@@ -66,9 +66,9 @@ def main() -> str:
         )
     else:
         scores = play_tournament_points(
-                size=args.board_size,
-                num_games=args.games,
-                players=tuple(load_players(strategies_folder, args.include_bad, args.py2))
+            size=args.board_size,
+            num_games=args.games,
+            players=tuple(load_players(strategies_folder, args.include_bad, args.py2))
         )
         longest_name_length = max([len(score.player) for score in scores])
         l = '{:' + str(longest_name_length + 2) + 's}{:9d} {:9.2%} {:9d} {:9d} {:9d} {:9d}\n'

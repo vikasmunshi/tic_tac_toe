@@ -16,7 +16,7 @@ def count_sub_items(l: TypeTupleOfTuples) -> dict:
     return Counter([i for s in l for i in s])
 
 
-def flatten(l: TypeTupleOfTuples) -> (tuple, ...):
+def flatten(l: TypeTupleOfTuples) -> ():
     return tuple([i for s in l for i in s])
 
 

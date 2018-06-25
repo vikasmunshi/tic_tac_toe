@@ -6,7 +6,7 @@ Play a tournament of tic-tac-toe
 
     pip3 install -e git+https://github.com/vikasmunshi/tic_tac_toe.git#egg=akira
     
-## Unistall:
+## Uninstall:
 
     pip3 uninstall tic_tac_toe
 

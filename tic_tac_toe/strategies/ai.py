@@ -24,7 +24,7 @@ def reduce_board(board: Board) -> Game:
 def memorize_games(size: int) -> None:
     cache_file = abspath(splitext(__file__)[0] + '.{}.json'.format(size))
     if exists(cache_file):
-        with open(cache_file, 'r') as infile:
+        with open(cache_file) as infile:
             for g in load(infile):
                 remember(game=Game(moves=tuple(Cell(*c) for c in g[0]), result=g[1]))
     elif size < 4:
