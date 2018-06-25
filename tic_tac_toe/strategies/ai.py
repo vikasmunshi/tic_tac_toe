@@ -21,7 +21,7 @@ def reduce_board(board: Board) -> Game:
 
 
 @cached
-def memorize_all_games(size: int) -> None:
+def memorize_games(size: int) -> None:
     cache_file = abspath(splitext(__file__)[0] + '.{}.json'.format(size))
     if exists(cache_file):
         with open(cache_file, 'r') as infile:
@@ -43,7 +43,7 @@ def normalize_result(game: Game, player: int) -> int:
 
 @cached
 def suggest_moves(board) -> Cells:
-    memorize_all_games(board.size)
+    memorize_games(board.size)
     num_moves = len(board.moves)
     scores = {}
     for next_move, winner in ((g.moves[num_moves], g.result) for g in recollect(board.moves)):
