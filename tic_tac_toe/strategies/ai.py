@@ -42,7 +42,7 @@ def normalize_result(game: Game, player: int) -> int:
     return 1 if game.result == 'D' else 4 if player == len(game.moves) % 2 else -2
 
 
-@cached
+# @cached
 def remembered_best_moves(games: Games, move_num: int) -> Cells:
     scores = {}
     for next_move, winner in ((g.moves[move_num], g.result) for g in games):
