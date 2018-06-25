@@ -4,7 +4,7 @@
 from setuptools import setup
 
 setup(
-        name='tic_tac_toe',
+        name='akira',
         version='1.4.1',
         author='Vikas Munshi',
         author_email='vikas.munshi@gmail.com',
