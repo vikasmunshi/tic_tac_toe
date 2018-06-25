@@ -7,7 +7,7 @@ from .types import Board, Cell, Cells, Player, Players, Scores
 from .util import cached, select_random_cell
 
 __package__ = 'tic_tac_toe'
-__version__ = '1.4.1'
+__version__ = '1.4.2'
 memoize = cached
 __all__ = ['Board', 'Cell', 'Cells', 'Player', 'Players', 'Scores',
            'cached', 'memoize',

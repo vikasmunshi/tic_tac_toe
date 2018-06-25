@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
         name='akira',
-        version='1.4.1',
+        version='1.4.2',
         author='Vikas Munshi',
         author_email='vikas.munshi@gmail.com',
         url='https://github.com/vikasmunshi/tic_tac_toe.git',
