@@ -9,7 +9,7 @@ setup(
         author='Vikas Munshi',
         author_email='vikas.munshi@gmail.com',
         url='https://github.com/vikasmunshi/tic_tac_toe.git',
-        description='Tic Tac Toe Tornament',
+        description='Tic Tac Toe Tournament',
         packages=['tic_tac_toe', 'tic_tac_toe.strategies'],
         package_dir={'tic_tac_toe': 'tic_tac_toe'},
         install_requires=[],
