@@ -5,9 +5,10 @@ import atexit
 import os.path
 import pickle
 
-from .types import Board, Cell, Cells, Game, Moves, TypeFuncBoard
+from .types import Board, Game, Moves, TypeFuncBoard
+from .util import cached
 
-cache = {'moves': {}, 'seen': set()}
+cache = {'moves': {}, 'games': set()}
 
 
 def dump_cache(cache_file: str) -> None:
@@ -27,39 +28,32 @@ def load_cache(cache_file: str) -> bool:
 
 
 def recollect(moves: Moves) -> dict:
-    return cache['moves'].get(moves, {})
+    return dict(cache['moves'].get(moves, {}))
 
 
-def remember(moves: Cells, next_move: Cell, winner: str, game_len: int) -> None:
+def remember_game(game: Game, size: int) -> None:
     global cache
-    if moves not in cache['moves']:
-        cache['moves'][moves] = {}
-    if next_move not in cache['moves'][moves]:
-        cache['moves'][moves][next_move] = {'W': 0, 'D': 0, 'L': 0, 'S': 0}
-    move_num_2 = len(moves) % 2
-    bucket = 'D' if winner == 'D' else 'W' if winner == ('X', 'O')[move_num_2] else 'L'
-    cache['moves'][moves][next_move][bucket] += [x for x in range(game_len + 1, 0, -1)][game_len - len(moves)]
-    cache['moves'][moves][next_move]['S'] = score_moves(cache['moves'][moves][next_move], move_num_2)
-
-
-def remember_game(game: Game) -> None:
-    global cache
-    if not game in cache['seen']:
-        game_len = len(game.moves)
-        for mvs, n_mv, wnr in ((game.moves[:i], game.moves[i], game.result) for i in range(0, game_len)):
-            remember(mvs, n_mv, wnr, game_len)
-        cache['seen'].add(game)
+    if not game in cache['games']:
+        for slider in range(0, len(game)):
+            moves, next_move = game.moves[:slider], game.moves[slider]
+            if not moves in cache['moves']: cache['moves'][moves] = {}
+            if not next_move in cache['moves'][moves]: cache['moves'][moves][next_move] = 0
+            cache['moves'][game.moves[:slider]][next_move] += \
+                (0 if game.result == 'D' else 1 if game.result == ('X', 'O')[slider % 2] else -1) * \
+                2 ** score_move(size)[len(game.moves) - slider]
+        cache['games'].add(game)
 
 
 def remembered(func: TypeFuncBoard) -> TypeFuncBoard:
     def f(board: Board) -> str:
         result = func(board)
         if result:
-            remember_game(Game(moves=board.moves, result=result))
+            remember_game(Game(moves=board.moves, result=result), size=board.size)
         return result
 
     return f
 
 
-def score_moves(score: dict, move_num_2: int) -> int:
-    return int(100 * (score['W'] + (score['D'] * move_num_2) - score['L']) / (score['W'] + score['D'] + score['L']))
+@cached
+def score_move(size):
+    return tuple(x for x in range(size * size + 1, 0, -1))
