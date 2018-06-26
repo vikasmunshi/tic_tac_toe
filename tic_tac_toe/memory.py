@@ -6,9 +6,8 @@ import os.path
 import pickle
 
 from .types import Board, Cell, Cells, Game, Moves, TypeFuncBoard
-from .util import cached
 
-cache = {}
+cache = {'moves': {}, 'seen': set()}
 
 
 def dump_cache(cache_file: str) -> None:
@@ -28,25 +27,27 @@ def load_cache(cache_file: str) -> bool:
 
 
 def recollect(moves: Moves) -> dict:
-    return cache.get(moves, {})
+    return cache['moves'].get(moves, {})
 
 
 def remember(moves: Cells, next_move: Cell, winner: str) -> None:
     global cache
-    if moves not in cache:
-        cache[moves] = {}
-    if next_move not in cache[moves]:
-        cache[moves][next_move] = {'W': 0, 'D': 0, 'L': 0, 'S': 0}
+    if moves not in cache['moves']:
+        cache['moves'][moves] = {}
+    if next_move not in cache['moves'][moves]:
+        cache['moves'][moves][next_move] = {'W': 0, 'D': 0, 'L': 0, 'S': 0}
     move_num_2 = len(moves) % 2
     bucket = 'D' if winner == 'D' else 'W' if winner == ('X', 'O')[move_num_2] else 'L'
-    cache[moves][next_move][bucket] += 1
-    cache[moves][next_move]['S'] = score_moves(cache[moves][next_move], move_num_2)
+    cache['moves'][moves][next_move][bucket] += 1
+    cache['moves'][moves][next_move]['S'] = score_moves(cache['moves'][moves][next_move], move_num_2)
 
 
-@cached
 def remember_game(game: Game) -> None:
-    for moves, next_move, winner in ((game.moves[:i], game.moves[i], game.result) for i in range(0, len(game.moves))):
-        remember(moves, next_move, winner)
+    global cache
+    if not game in cache['seen']:
+        for m, nm, w in ((game.moves[:i], game.moves[i], game.result) for i in range(0, len(game.moves))):
+            remember(m, nm, w)
+        cache['seen'].add(game)
 
 
 def remembered(func: TypeFuncBoard) -> TypeFuncBoard:
