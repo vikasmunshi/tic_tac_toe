@@ -22,9 +22,9 @@ def create_empty_board(size: int) -> Board:
     return Board(size, ())
 
 
-@remembered
 @show_board
 @cached
+@remembered
 def check_winner(board: Board) -> str:
     return ('O', 'X')[len(board.moves) % 2] if last_move_has_won(board) else 'D' if board_is_full(board) else ''
 

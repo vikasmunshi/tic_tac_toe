@@ -6,6 +6,7 @@ import os.path
 import pickle
 
 from .types import Board, Cell, Cells, Game, Moves, TypeFuncBoard
+from .util import cached
 
 cache = {}
 
@@ -42,6 +43,7 @@ def remember(moves: Cells, next_move: Cell, winner: str) -> None:
     cache[moves][next_move]['S'] = score_moves(cache[moves][next_move], move_num_2)
 
 
+@cached
 def remember_game(game: Game) -> None:
     for moves, next_move, winner in ((game.moves[:i], game.moves[i], game.result) for i in range(0, len(game.moves))):
         remember(moves, next_move, winner)
