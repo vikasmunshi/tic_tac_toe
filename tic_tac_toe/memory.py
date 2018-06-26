@@ -33,12 +33,14 @@ def recollect(moves: Moves) -> dict:
 
 def remember_game(game: Game, size: int) -> None:
     global cache
-    if not game in cache['games']:
+    if game not in cache['games']:
         for slider in range(0, len(game)):
             moves, next_move = game.moves[:slider], game.moves[slider]
-            if not moves in cache['moves']: cache['moves'][moves] = {}
-            if not next_move in cache['moves'][moves]: cache['moves'][moves][next_move] = 0
-            cache['moves'][game.moves[:slider]][next_move] += \
+            if moves not in cache['moves']:
+                cache['moves'][moves] = {}
+            if next_move not in cache['moves'][moves]:
+                cache['moves'][moves][next_move] = 0
+            cache['moves'][moves][next_move] += \
                 (0 if game.result == 'D' else 1 if game.result == ('X', 'O')[slider % 2] else -1) * \
                 2 ** score_move(size)[len(game.moves) - slider]
         cache['games'].add(game)
