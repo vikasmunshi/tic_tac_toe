@@ -30,7 +30,7 @@ def recollect(moves: Moves) -> dict:
     return cache['moves'].get(moves, {})
 
 
-def remember(moves: Cells, next_move: Cell, winner: str) -> None:
+def remember(moves: Cells, next_move: Cell, winner: str, game_len: int) -> None:
     global cache
     if moves not in cache['moves']:
         cache['moves'][moves] = {}
@@ -38,15 +38,16 @@ def remember(moves: Cells, next_move: Cell, winner: str) -> None:
         cache['moves'][moves][next_move] = {'W': 0, 'D': 0, 'L': 0, 'S': 0}
     move_num_2 = len(moves) % 2
     bucket = 'D' if winner == 'D' else 'W' if winner == ('X', 'O')[move_num_2] else 'L'
-    cache['moves'][moves][next_move][bucket] += 1
+    cache['moves'][moves][next_move][bucket] += [x for x in range(game_len + 1, 0, -1)][game_len - len(moves)]
     cache['moves'][moves][next_move]['S'] = score_moves(cache['moves'][moves][next_move], move_num_2)
 
 
 def remember_game(game: Game) -> None:
     global cache
     if not game in cache['seen']:
-        for m, nm, w in ((game.moves[:i], game.moves[i], game.result) for i in range(0, len(game.moves))):
-            remember(m, nm, w)
+        game_len = len(game.moves)
+        for mvs, n_mv, wnr in ((game.moves[:i], game.moves[i], game.result) for i in range(0, game_len)):
+            remember(mvs, n_mv, wnr, game_len)
         cache['seen'].add(game)
 
 

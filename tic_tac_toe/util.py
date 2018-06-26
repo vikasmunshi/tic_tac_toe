@@ -32,10 +32,10 @@ def logged(func: TypeFunc, log_file: TextIOBase = stderr) -> TypeFunc:
     return f
 
 
-def printed(func: TypeFunc, log_file: TextIOBase = stderr) -> TypeFunc:
+def printed(func: TypeFunc, print_file: TextIOBase = stderr) -> TypeFunc:
     def f(*args, **kwargs) -> str:
         r = func(*args, **kwargs)
-        print(r, file=log_file)
+        print(r, file=print_file)
         return r
 
     return f
