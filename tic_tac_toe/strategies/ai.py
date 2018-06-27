@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/strategies/ai.py
-from itertools import permutations
-from operator import itemgetter
+from itertools import groupby, permutations
 from os.path import abspath, splitext
 
 from tic_tac_toe.core import get_cells, get_possible_moves, last_move_has_won
@@ -24,16 +23,22 @@ def memorize_games(size: int) -> None:
     cache_file = abspath(splitext(__file__)[0] + '.{}.pickle'.format(size))
     if (not load_cache(cache_file)) and size < 4:
         for g in (reduce_board(Board(size, moves)) for moves in permutations(get_cells(Board(size=size, moves=())))):
-            remember_game(g, size)
+            remember_game(g)
 
 
 def suggest_moves(board) -> Cells:
     memorize_games(board.size)
-    scores = recollect(board.moves)
-    if scores:
-        max_score = max(scores.items(), key=itemgetter(1))[1]
-        return tuple(m[0] for m in scores.items() if m[1] == max_score)
-    return ()
+    move_num = len(board.moves)
+
+    def bucket(game: Game) -> str:
+        return 'D' if game.result == 'D' else 'W' if game.result == ('X', 'O')[move_num % 2] else 'L'
+
+    moves = {bucket: tuple(game.moves[move_num] for game in games)
+             for bucket, games in groupby(sorted(recollect(board.moves), key=bucket), key=bucket)}
+    return (
+        tuple(move for move in moves.get('W', ()) if move not in moves.get('L', ())) or
+        tuple(move for move in moves.get('W', ()) if move in moves.get('D', ()))
+    )
 
 
 def strategy(board: Board) -> Cell:

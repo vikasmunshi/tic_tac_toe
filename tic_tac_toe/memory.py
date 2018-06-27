@@ -4,11 +4,11 @@
 import atexit
 import os.path
 import pickle
+from typing import Iterable
 
 from .types import Board, Game, Moves, TypeFuncBoard
-from .util import cached
 
-cache = {'moves': {}, 'games': set()}
+cache = set()
 
 
 def dump_cache(cache_file: str) -> None:
@@ -17,45 +17,29 @@ def dump_cache(cache_file: str) -> None:
 
 
 def load_cache(cache_file: str) -> bool:
-    global cache
+    global cache, graph
     atexit.register(dump_cache, cache_file=cache_file)
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as infile:
             cache = pickle.load(infile)
         return True
-
     return False
 
 
-def recollect(moves: Moves) -> dict:
-    return dict(cache['moves'].get(moves, {}))
+def recollect(moves: Moves) -> Iterable[Game]:
+    return (game for game in cache if game.moves[:len(moves)] == moves)
 
 
-def remember_game(game: Game, size: int) -> None:
-    global cache
-    if game not in cache['games']:
-        for slider in range(0, len(game)):
-            moves, next_move = game.moves[:slider], game.moves[slider]
-            if moves not in cache['moves']:
-                cache['moves'][moves] = {}
-            if next_move not in cache['moves'][moves]:
-                cache['moves'][moves][next_move] = 0
-            cache['moves'][moves][next_move] += \
-                (0 if game.result == 'D' else 1 if game.result == ('X', 'O')[slider % 2] else -1) * \
-                2 ** score_move(size)[len(game.moves) - slider]
-        cache['games'].add(game)
+def remember_game(game: Game) -> None:
+    global cache, graph
+    cache.add(game)
 
 
 def remembered(func: TypeFuncBoard) -> TypeFuncBoard:
     def f(board: Board) -> str:
         result = func(board)
         if result:
-            remember_game(Game(moves=board.moves, result=result), size=board.size)
+            remember_game(Game(moves=board.moves, result=result))
         return result
 
     return f
-
-
-@cached
-def score_move(size):
-    return tuple(x for x in range(size * size + 1, 0, -1))
