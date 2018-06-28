@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/strategies/ai.py
 from itertools import groupby, permutations
+from operator import itemgetter
 from os.path import abspath, splitext
 
 from tic_tac_toe.core import get_cells, get_possible_moves, last_move_has_won
 from tic_tac_toe.memory import load_cache, recollect, remember_game
 from tic_tac_toe.types import Board, Cell, Cells, Game
-from tic_tac_toe.util import cached, select_random_cell
+from tic_tac_toe.util import cached, select_random_cell, logged
 
 
 @cached
@@ -26,6 +27,7 @@ def memorize_games(size: int) -> None:
             remember_game(g)
 
 
+@logged
 def suggest_moves(board) -> Cells:
     memorize_games(board.size)
     move_num = len(board.moves)
@@ -33,12 +35,16 @@ def suggest_moves(board) -> Cells:
     def bucket(game: Game) -> str:
         return 'D' if game.result == 'D' else 'W' if game.result == ('X', 'O')[move_num % 2] else 'L'
 
-    moves = {bucket: tuple(game.moves[move_num] for game in games)
-             for bucket, games in groupby(sorted(recollect(board.moves), key=bucket), key=bucket)}
-    return (
-        tuple(move for move in moves.get('W', ()) if move not in moves.get('L', ())) or
-        tuple(move for move in moves.get('W', ()) if move in moves.get('D', ()))
-    )
+    recollected = sorted(recollect(board.moves), key=bucket)
+    moves = {b: tuple(game.moves[move_num] for game in games) for b, games in groupby(recollected, key=bucket)}
+    s = {
+        move: 1000 * int(sum(
+            w * moves.get(b, ()).count(move)
+            for w, b in zip(((0, -2, 1), (1, -3, 1))[move_num % 2], ('D', 'L', 'W'))) / len(moves))
+        for move in get_possible_moves(board)
+        }
+    max_score = max(s.items(), key=itemgetter(1))[1]
+    return tuple(m for m in get_possible_moves(board) if s[m] == max_score)
 
 
 def strategy(board: Board) -> Cell:
