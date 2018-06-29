@@ -15,5 +15,6 @@ __all__ = (
     'play_tournament_eliminate', 'play_tournament_points',
     'Board', 'Cell', 'Cells', 'Lines', 'Player', 'Players', 'Scores',
     'cached', 'select_random_cell',
-    'itemgetter', 'suggest_moves'
+    'itemgetter', 'suggest_moves',
+    'memoize'
 )
