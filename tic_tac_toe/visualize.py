@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/visualize.py
-
 from .types import Board, Cell, Cells, Player, TypeFuncBoard, TypeFuncGame
 from .util import cached, printed
 

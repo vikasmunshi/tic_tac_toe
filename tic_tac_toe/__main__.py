@@ -2,23 +2,23 @@
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/__main__.py
 import argparse
+import glob
 import importlib.util
 import inspect
-from glob import iglob
-from os import environ, path
-from time import time
+import os
+import time
 
 from .core import re_memorize_games, strategy
 from .tournament import play_tournament_eliminate, play_tournament_points
 from .types import Player, Players
 
-environ['COLUMNS'] = '120'
+os.environ['COLUMNS'] = '120'
 
 
 def load_players(players_folder: str, include_bad: bool = False, ignore_signature: bool = False) -> Players:
     expected_signature = inspect.signature(strategy)
-    for player_file in iglob(path.join(players_folder, '[!_]*.py')):
-        player_name = path.splitext(path.basename(player_file))[0]
+    for player_file in glob.iglob(os.path.join(players_folder, '[!_]*.py')):
+        player_name = os.path.splitext(os.path.basename(player_file))[0]
         try:
             if not include_bad and player_name.startswith('bad'):
                 continue
@@ -52,7 +52,7 @@ def main() -> str:
                         help='also load python 2 strategy files')
 
     args = parser.parse_args()
-    strategies_folder = args.strategies_folder or path.join(path.dirname(__file__), 'strategies')
+    strategies_folder = args.strategies_folder or os.path.join(os.path.dirname(__file__), 'strategies')
     re_memorize_games(args.board_size)
     if args.tournament_type == 'fight':
         winners = play_tournament_eliminate(
@@ -82,8 +82,8 @@ def main() -> str:
 
 
 if __name__ == '__main__':
-    st = time()
+    st = time.time()
     result = main()
-    et = time()
+    et = time.time()
     print('Tournament completed in {0:0.4f} seconds'.format(et - st))
     print('\n' + result)

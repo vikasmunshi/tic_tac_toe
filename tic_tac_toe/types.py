@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/types.py
+import collections
+import typing
 
-from collections import namedtuple
-from typing import Callable, Generator, Tuple, Union
-
-Board = namedtuple('Board', ('size', 'moves'))
-Cell = namedtuple('Cell', ('row_id', 'col_id'))
+Board = collections.namedtuple('Board', ('size', 'moves'))
+Cell = collections.namedtuple('Cell', ('row_id', 'col_id'))
 Cell.__repr__ = lambda self: 'c{}{}'.format(self.row_id, self.col_id)
-Cells = Tuple[Cell, ...]
-Game = namedtuple('Game', ['moves', 'result'])
-Games = Tuple[Game, ...]
-Lines = Tuple[Cells, ...]
+Cells = typing.Tuple[Cell, ...]
+Game = collections.namedtuple('Game', ['moves', 'result'])
+Games = typing.Tuple[Game, ...]
+Lines = typing.Tuple[Cells, ...]
 Moves = Cells
-Player = namedtuple('Player', ('name', 'strategy'))
+Player = collections.namedtuple('Player', ('name', 'strategy'))
 Player.__repr__ = lambda self: self.name
-Players = Tuple[Player, ...]
-Score = namedtuple('Score', ('player', 'points', 'wins', 'draws', 'losses', 'games', 'penalties'))
-Scores = Tuple[Score, ...]
-TypeFunc = Callable[[tuple, dict], str]
-TypeFuncBoard = Callable[[Board], str]
-TypeFuncGame = Callable[[int, Player, Player], str]
-TypeTupleOfTuples = Union[Tuple[Tuple, ...], Generator[Tuple[Tuple, ...], None, None]]
+Players = typing.Tuple[Player, ...]
+Score = collections.namedtuple('Score', ('player', 'points', 'wins', 'draws', 'losses', 'games', 'penalties'))
+Scores = typing.Tuple[Score, ...]
+TypeFunc = typing.Callable[[tuple, dict], str]
+TypeFuncBoard = typing.Callable[[Board], str]
+TypeFuncGame = typing.Callable[[int, Player, Player], str]
+TypeTupleOfTuples = typing.Union[typing.Tuple[typing.Tuple, ...],
+                                 typing.Generator[typing.Tuple[typing.Tuple, ...], None, None]]

@@ -28,7 +28,7 @@ def get_costs(board: Board) -> (Cell, int):
 
 @cached
 def get_costs_min_cost(board: Board) -> int:
-    return min(get_costs(board), key=itemgetter(1))[1]
+    return min(get_costs(board), key=operator.itemgetter(1))[1]
 
 
 @cached

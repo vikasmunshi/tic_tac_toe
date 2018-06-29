@@ -1,32 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/util.py
-from collections import Counter
-from functools import lru_cache
-from io import TextIOBase
-from itertools import permutations
-from random import choice
-from sys import stderr
-from typing import Iterable
+import collections
+import functools
+import io
+import itertools
+import random
+import sys
+import typing
 
 from .types import Cell, Cells, TypeFunc, TypeTupleOfTuples
 
-cached = lru_cache(maxsize=None, typed=False)
+Counter = collections.Counter
+cached = functools.lru_cache(maxsize=None, typed=False)
 
 
 def count_sub_items(l: TypeTupleOfTuples) -> dict:
-    return Counter([i for s in l for i in s])
+    return Counter((i for s in l for i in s))
 
 
 def flatten(l: TypeTupleOfTuples) -> ():
     return tuple([i for s in l for i in s])
 
 
-def get_permutations(iterable: Iterable) -> Iterable:
-    return permutations(iterable)
+def get_permutations(iterable: typing.Iterable) -> typing.Iterable:
+    return itertools.permutations(iterable)
 
 
-def logged(func: TypeFunc, log_file: TextIOBase = stderr) -> TypeFunc:
+def logged(func: TypeFunc, log_file: io.TextIOBase = sys.stderr) -> TypeFunc:
     def f(*args, **kwargs) -> str:
         r = func(*args, **kwargs)
         if func.__name__ == '<lambda>':
@@ -38,7 +39,7 @@ def logged(func: TypeFunc, log_file: TextIOBase = stderr) -> TypeFunc:
     return f
 
 
-def printed(func: TypeFunc, print_file: TextIOBase = stderr) -> TypeFunc:
+def printed(func: TypeFunc, print_file: io.TextIOBase = sys.stderr) -> TypeFunc:
     def f(*args, **kwargs) -> str:
         r = func(*args, **kwargs)
         print(r, file=print_file)
@@ -48,4 +49,4 @@ def printed(func: TypeFunc, print_file: TextIOBase = stderr) -> TypeFunc:
 
 
 def select_random_cell(cells: Cells) -> Cell:
-    return choice(cells) if cells else None
+    return random.choice(cells) if cells else None

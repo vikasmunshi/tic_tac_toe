@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/core.py
-from .memory import load_cache, remember_game, remembered
+from .game_memory import load_cache, remember_game, remembered
 from .types import Board, Cell, Cells, Game, Lines, Player
 from .util import cached, select_random_cell, get_permutations
 from .visualize import show_board, show_game
