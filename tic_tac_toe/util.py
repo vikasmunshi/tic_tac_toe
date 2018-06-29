@@ -4,8 +4,10 @@
 from collections import Counter
 from functools import lru_cache
 from io import TextIOBase
+from itertools import permutations
 from random import choice
 from sys import stderr
+from typing import Iterable
 
 from .types import Cell, Cells, TypeFunc, TypeTupleOfTuples
 
@@ -18,6 +20,10 @@ def count_sub_items(l: TypeTupleOfTuples) -> dict:
 
 def flatten(l: TypeTupleOfTuples) -> ():
     return tuple([i for s in l for i in s])
+
+
+def get_permutations(iterable: Iterable) -> Iterable:
+    return permutations(iterable)
 
 
 def logged(func: TypeFunc, log_file: TextIOBase = stderr) -> TypeFunc:

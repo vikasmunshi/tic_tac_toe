@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/strategies/ml.py
-from operator import itemgetter
-
-from tic_tac_toe.core import get_possible_moves, get_lines, last_move_has_won
-from tic_tac_toe.types import Board, Cell, Cells, Lines
-from tic_tac_toe.util import cached, select_random_cell
+from tic_tac_toe import *
 
 
 @cached
@@ -21,13 +17,18 @@ def count_free_lines(lines: Lines, moves: Cells) -> int:
 
 
 @cached
+def get_cost_optimal_moves(board: Board) -> Cells:
+    return tuple(c[0] for c in get_costs(board) if c[1] == get_costs_min_cost(board))
+
+
+@cached
 def get_costs(board: Board) -> (Cell, int):
     return tuple((move, cost_function(board, move)) for move in get_possible_moves(board))
 
 
 @cached
-def get_cost_optimal_moves(board: Board) -> Cells:
-    return tuple(c[0] for c in get_costs(board) if c[1] == min(get_costs(board), key=itemgetter(1))[1])
+def get_costs_min_cost(board: Board) -> int:
+    return min(get_costs(board), key=itemgetter(1))[1]
 
 
 @cached

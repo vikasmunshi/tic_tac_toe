@@ -8,7 +8,7 @@ from glob import iglob
 from os import environ, path
 from time import time
 
-from .core import strategy
+from .core import re_memorize_games, strategy
 from .tournament import play_tournament_eliminate, play_tournament_points
 from .types import Player, Players
 
@@ -53,6 +53,7 @@ def main() -> str:
 
     args = parser.parse_args()
     strategies_folder = args.strategies_folder or path.join(path.dirname(__file__), 'strategies')
+    re_memorize_games(args.board_size)
     if args.tournament_type == 'fight':
         winners = play_tournament_eliminate(
             size=args.board_size,

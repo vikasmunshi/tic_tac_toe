@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/core.py
-from .memory import remembered
-from .types import Board, Cell, Cells, Lines, Player
-from .util import cached, select_random_cell
+from .memory import load_cache, remember_game, remembered
+from .types import Board, Cell, Cells, Game, Lines, Player
+from .util import cached, select_random_cell, get_permutations
 from .visualize import show_board, show_game
 
 
@@ -90,6 +90,22 @@ def play_game(size: int, one: Player, two: Player) -> str:
 
 def play_game_set(size: int, one: Player, two: Player) -> (str, str):
     return play_game(size, one, two), play_game(size, two, one)
+
+
+@cached
+def re_memorize_games(size: int) -> None:
+    if (not load_cache(__file__, size)) and size < 4:
+        for game in (reduce_board(Board(size, moves))
+                     for moves in get_permutations(get_cells(Board(size=size, moves=())))):
+            remember_game(game)
+
+
+@cached
+def reduce_board(board: Board) -> Game:
+    for subset_moves in (board.moves[0:n] for n in range(2 * board.size - 1, board.size * board.size + 1)):
+        if last_move_has_won(Board(board.size, subset_moves)):
+            return Game(moves=subset_moves, result=('O', 'X')[len(subset_moves) % 2])
+    return Game(moves=board.moves, result='D')
 
 
 def strategy(board: Board) -> Cell:
