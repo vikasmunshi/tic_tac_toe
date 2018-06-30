@@ -97,7 +97,7 @@ def load_graph(graph_name: str, size: int) -> bool:
         try:
             with open(cache_file, 'rb') as infile:
                 graph = pickle.load(infile)
-        except (EOFError, FileNotFoundError, IOError):
+        except (EOFError, FileNotFoundError, IOError, ModuleNotFoundError):
             return True
         else:
             return False

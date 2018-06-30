@@ -34,7 +34,7 @@ def load_memory(cache_name: str, size: int) -> bool:
         try:
             with open(cache_file, 'rb') as infile:
                 memory = pickle.load(infile)
-        except (EOFError, FileNotFoundError, IOError):
+        except (EOFError, FileNotFoundError, IOError, ModuleNotFoundError):
             return True
         else:
             return False

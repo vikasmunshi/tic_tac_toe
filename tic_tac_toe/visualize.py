@@ -19,7 +19,7 @@ def base_marker_positions(size: int, moves: Cells) -> ():
                  if position_num < len(marker_positions))
 
 
-# @printed
+@printed
 @cached
 def draw_board(board: Board) -> str:
     board_str = an_empty_board(board.size)
