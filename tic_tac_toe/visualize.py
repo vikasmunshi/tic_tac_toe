@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/visualize.py
-from .types import Board, Cell, Cells, Player, TypeFuncBoard, TypeFuncGame
+from .user_types import Board, Cell, Cells, Player, TypeFuncBoard, TypeFuncGame
 from .util import cached, printed
 
 
@@ -19,7 +19,7 @@ def base_marker_positions(size: int, moves: Cells) -> ():
                  if position_num < len(marker_positions))
 
 
-@printed
+# @printed
 @cached
 def draw_board(board: Board) -> str:
     board_str = an_empty_board(board.size)

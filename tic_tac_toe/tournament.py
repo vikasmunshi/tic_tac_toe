@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/tournament.py
 from .core import play_game_set
-from .types import Player, Players, Score, Scores
+from .user_types import Player, Players, Score, Scores
 from .util import count_sub_items, flatten, logged
 
 

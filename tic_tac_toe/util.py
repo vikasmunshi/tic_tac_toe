@@ -9,7 +9,7 @@ import random
 import sys
 import typing
 
-from .types import Cell, Cells, TypeFunc, TypeTupleOfTuples
+from .user_types import Cell, Cells, TypeFunc, TypeTupleOfTuples
 
 Counter = collections.Counter
 cached = functools.lru_cache(maxsize=None, typed=False)

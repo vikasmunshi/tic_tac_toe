@@ -20,5 +20,8 @@ Scores = typing.Tuple[Score, ...]
 TypeFunc = typing.Callable[[tuple, dict], str]
 TypeFuncBoard = typing.Callable[[Board], str]
 TypeFuncGame = typing.Callable[[int, Player, Player], str]
+TypeGraphNode = typing.Union[Moves, str]
+TypeGraphPath = typing.Tuple[TypeGraphNode, ...]
+TypeGraphPaths = typing.Tuple[TypeGraphPath, ...]
 TypeTupleOfTuples = typing.Union[typing.Tuple[typing.Tuple, ...],
                                  typing.Generator[typing.Tuple[typing.Tuple, ...], None, None]]

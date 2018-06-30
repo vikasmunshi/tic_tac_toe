@@ -10,7 +10,7 @@ import time
 
 from .core import re_memorize_games, strategy
 from .tournament import play_tournament_eliminate, play_tournament_points
-from .types import Player, Players
+from .user_types import Player, Players
 
 os.environ['COLUMNS'] = '120'
 
@@ -31,6 +31,8 @@ def load_players(players_folder: str, include_bad: bool = False, ignore_signatur
             assert ignore_signature or inspect.signature(player_strategy) == expected_signature, \
                 'signature is not strategy{}'.format(expected_signature)
             yield Player(player_name, player_strategy)
+        except SystemExit:
+            print('{} ignored because of exit from code'.format(player_name))
         except (AssertionError, AttributeError, ImportError, SyntaxError, TypeError) as e:
             print('{} ignored because {}'.format(player_name, str(e)))
 

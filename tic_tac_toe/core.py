@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/core.py
-from .game_memory import load_cache, remember_game, remembered
-from .types import Board, Cell, Cells, Game, Lines, Player
-from .util import cached, select_random_cell, get_permutations
+from .game_graph import load_graph, add_game_to_graph
+from .game_memory import load_memory, add_game_to_memory, remembered_in_memory
+from .user_types import Board, Cell, Cells, Game, Lines, Player
+from .util import cached, get_permutations, printed, select_random_cell
 from .visualize import show_board, show_game
 
 
@@ -24,7 +25,8 @@ def create_empty_board(size: int) -> Board:
 
 @show_board
 @cached
-@remembered
+@remembered_in_memory
+@remembered_in_memory
 def check_winner(board: Board) -> str:
     return ('O', 'X')[len(board.moves) % 2] if last_move_has_won(board) else 'D' if board_is_full(board) else ''
 
@@ -70,7 +72,14 @@ def last_move_has_won(board: Board) -> bool:
 
 
 def play(board: Board, one: Player, two: Player) -> str:
-    move = one.strategy(board)
+    try:
+        move = one.strategy(board)
+    except SystemExit:
+        printed(lambda: 'bad bad {} tried to exit()!'.format(one.name))()
+        return 'I.{}'.format(one.name)
+    except Exception as e:
+        printed(lambda: repr(e))()
+        return 'I.{}'.format(one.name)
     if move not in get_possible_moves(board):
         return 'I.{}'.format(one.name)
     return check_winner(add_move_to_board(board, move)) or play(add_move_to_board(board, move), two, one)
@@ -94,10 +103,11 @@ def play_game_set(size: int, one: Player, two: Player) -> (str, str):
 
 @cached
 def re_memorize_games(size: int) -> None:
-    if (not load_cache(__file__, size)) and size < 4:
+    if (load_memory(__file__, size) or load_graph(__file__, size)) and size < 4:
         for game in (reduce_board(Board(size, moves))
                      for moves in get_permutations(get_cells(Board(size=size, moves=())))):
-            remember_game(game)
+            add_game_to_memory(game)
+            add_game_to_graph(game)
 
 
 @cached
