@@ -108,7 +108,7 @@ def train_nn(size: int) -> None:
         data_output = np.array([nn_cell_to_vector(max(next_move, key=next_move.count), size)
                                 for next_move in nn_training_data.values()])
         nn_training_data.clear()
-        for i in range(10001):
+        for i in range(1001):
             l0 = data_input
             l1 = nn_sigmoid(np.dot(l0, nn[0]))
             l2 = nn_sigmoid(np.dot(l1, nn[1]))
@@ -120,5 +120,5 @@ def train_nn(size: int) -> None:
             nn[1] += l1.T.dot(l2_delta)
             nn[0] += l0.T.dot(l1_delta)
 
-            if i % 1000 == 0:
+            if i % 100 == 0:
                 print('err:', i, np.mean(np.abs(l2_error)), l0.size)
