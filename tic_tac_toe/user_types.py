@@ -6,7 +6,7 @@ import typing
 
 Board = collections.namedtuple('Board', ('size', 'moves'))
 Cell = collections.namedtuple('Cell', ('row_id', 'col_id'))
-Cell.__repr__ = lambda self: 'c{}{}'.format(self.row_id, self.col_id)
+Cell.__repr__ = lambda self: 'r{}c{}'.format(self.row_id, self.col_id)
 Cells = typing.Tuple[Cell, ...]
 Game = collections.namedtuple('Game', ['moves', 'result'])
 Games = typing.Tuple[Game, ...]

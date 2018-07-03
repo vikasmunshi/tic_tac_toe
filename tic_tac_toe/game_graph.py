@@ -35,16 +35,16 @@ def dump_graph(cache_file: str) -> None:
 
 @cached
 def find_all_paths(start: TypeGraphNode, end: TypeGraphNode) -> TypeGraphPaths:
-    def _find_all_paths(start: TypeGraphNode, end: TypeGraphNode, path: TypeGraphPath) -> TypeGraphPaths:
-        path += (start,)
-        if start == end:
-            return (path,)
-        if start not in graph:
+    def _find_all_paths(s: TypeGraphNode, e: TypeGraphNode, path: TypeGraphPath) -> TypeGraphPaths:
+        path += (s,)
+        if s == e:
+            return path,
+        if s not in graph:
             return ()
         paths = ()
-        for node in graph[start]:
+        for node in graph[s]:
             if node not in path:
-                new_paths = _find_all_paths(node, end, path)
+                new_paths = _find_all_paths(node, e, path)
                 for new_path in new_paths:
                     paths += (new_path,)
         return paths
@@ -54,15 +54,15 @@ def find_all_paths(start: TypeGraphNode, end: TypeGraphNode) -> TypeGraphPaths:
 
 @cached
 def find_path(start: TypeGraphNode, end: TypeGraphNode) -> TypeGraphPath:
-    def _find_path(start: TypeGraphNode, end: TypeGraphNode, path: TypeGraphPath) -> TypeGraphPath:
-        path += (start,)
-        if start == end:
+    def _find_path(s: TypeGraphNode, e: TypeGraphNode, path: TypeGraphPath) -> TypeGraphPath:
+        path += (s,)
+        if s == e:
             return path
-        if start not in graph:
+        if s not in graph:
             return ()
-        for node in graph[start]:
+        for node in graph[s]:
             if node not in path:
-                new_path = _find_path(node, end, path)
+                new_path = _find_path(node, e, path)
                 if new_path: return new_path
         return ()
 
@@ -71,16 +71,16 @@ def find_path(start: TypeGraphNode, end: TypeGraphNode) -> TypeGraphPath:
 
 @cached
 def find_shortest_path(start: TypeGraphNode, end: TypeGraphNode) -> TypeGraphPath:
-    def _find_shortest_path(start: TypeGraphNode, end: TypeGraphNode, path: TypeGraphPath) -> TypeGraphPath:
-        path += (start,)
-        if start == end:
+    def _find_shortest_path(s: TypeGraphNode, e: TypeGraphNode, path: TypeGraphPath) -> TypeGraphPath:
+        path += (s,)
+        if s == e:
             return path
-        if start not in graph:
+        if s not in graph:
             return ()
         shortest = ()
-        for node in graph[start]:
+        for node in graph[s]:
             if node not in path:
-                new_path = _find_shortest_path(node, end, path)
+                new_path = _find_shortest_path(node, e, path)
                 if new_path:
                     if not shortest or len(new_path) < len(shortest):
                         shortest = new_path
@@ -89,6 +89,7 @@ def find_shortest_path(start: TypeGraphNode, end: TypeGraphNode) -> TypeGraphPat
     return _find_shortest_path(start, end, ())
 
 
+@cached
 def load_graph(graph_name: str, size: int) -> bool:
     global graph
     cache_file = os.path.abspath(os.path.splitext(graph_name)[0] + '.graph_{0}x{0}.pickle'.format(size))

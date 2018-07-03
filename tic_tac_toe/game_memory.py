@@ -26,6 +26,7 @@ def dump_memory(cache_file: str) -> None:
         pickle.dump(memory, outfile)
 
 
+@cached
 def load_memory(cache_name: str, size: int) -> bool:
     global memory
     cache_file = os.path.abspath(os.path.splitext(cache_name)[0] + '.memory_{0}x{0}.pickle'.format(size))

@@ -8,9 +8,13 @@ import inspect
 import os
 import time
 
-from .core import re_memorize_games, strategy
+from .core import get_cells, last_move_has_won, strategy
+from .game_graph import add_game_to_graph, load_graph
+from .game_memory import add_game_to_memory, load_memory
+from .game_nn import add_game_to_nn, load_nn, setup_nn, train_nn
 from .tournament import play_tournament_eliminate, play_tournament_points
-from .user_types import Player, Players
+from .user_types import Board, Game, Player, Players
+from .util import get_permutations
 
 os.environ['COLUMNS'] = '120'
 
@@ -35,6 +39,25 @@ def load_players(players_folder: str, include_bad: bool = False, ignore_signatur
             print('{} ignored because of exit from code'.format(player_name))
         except (AssertionError, AttributeError, ImportError, SyntaxError, TypeError) as e:
             print('{} ignored because {}'.format(player_name, str(e)))
+
+
+def re_memorize_games(size: int) -> None:
+    if any((load_memory(__package__, size), load_graph(__package__, size), load_nn(__package__, size))) and size < 4:
+        setup_nn(__package__, size)
+        for game in (reduce_board(Board(size, moves))
+                     for moves in get_permutations(get_cells(Board(size=size, moves=())))):
+            add_game_to_memory(game)
+            add_game_to_graph(game)
+            add_game_to_nn(game)
+
+        train_nn(size)
+
+
+def reduce_board(board: Board) -> Game:
+    for subset_moves in (board.moves[0:n] for n in range(2 * board.size - 1, board.size * board.size + 1)):
+        if last_move_has_won(Board(board.size, subset_moves)):
+            return Game(moves=subset_moves, result=('O', 'X')[len(subset_moves) % 2])
+    return Game(moves=board.moves, result='D')
 
 
 def main() -> str:
