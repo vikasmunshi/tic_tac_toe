@@ -59,5 +59,5 @@ def is_corner_cell(cell, board_size):
     return cell.row_id in (0, board_size - 1) and cell.col_id in (0, board_size - 1)
 
 
-def strategy(board: Board) -> Cell:
+def strategy(board):
     return select_random_cell(get_moves(board))
