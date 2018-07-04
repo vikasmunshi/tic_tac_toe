@@ -21,7 +21,7 @@ Play a tournament of tic-tac-toe
       -g GAMES              number of games per match, default is 1000
       -t {fight,points}     fight for elimination or play for points, default is elimination
       --include_bad         include files matching bad*.py in strategies folder, ignored by default
-      --py2                 also load python 2 strategy files
+      --py2                 also dict_load python 2 strategy files
     
 ## Template for player strategy file:
 
