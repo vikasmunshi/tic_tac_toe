@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # tic_tac_toe/strategies/hard_coded_3.py
-import atexit
 import json
 import os.path
 import string
@@ -26,19 +25,12 @@ def char_to_cell(char: str) -> Cell:
 
 
 @cached
-def dict_dump() -> None:
-    with open(os.path.abspath(os.path.splitext(__file__)[0] + '.json'), 'w') as outfile:
-        json.dump(board_3, outfile)
-
-
-@cached
 def dict_load() -> None:
     global board_3
     fn = os.path.abspath(os.path.splitext(__file__)[0] + '.json')
     if os.path.exists(fn):
         with open(fn) as infile:
             board_3 = json.load(infile)
-    atexit.register(dict_dump)
 
 
 def strategy(board: Board) -> Cell:
