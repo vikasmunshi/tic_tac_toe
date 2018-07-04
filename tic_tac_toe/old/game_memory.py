@@ -8,8 +8,8 @@ import os.path
 import pickle
 import typing
 
-from .user_types import Board, Cells, Game, Moves, TypeFuncBoard
-from .util import cached
+from tic_tac_toe.user_types import Board, Cells, Game, Moves, TypeFuncBoard
+from tic_tac_toe.util import cached
 
 memory = set()
 

@@ -7,8 +7,8 @@ import operator
 import os.path
 import pickle
 
-from .user_types import Board, Cells, Game, TypeFuncBoard, TypeGraphNode, TypeGraphPath, TypeGraphPaths
-from .util import cached
+from tic_tac_toe.user_types import Board, Cells, Game, TypeFuncBoard, TypeGraphNode, TypeGraphPath, TypeGraphPaths
+from tic_tac_toe.util import cached
 
 START = ()
 END_D = 'D'
