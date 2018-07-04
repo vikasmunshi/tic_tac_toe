@@ -26,7 +26,7 @@ def draw_board(board: Board) -> str:
     for marker_position, mark in base_marker_positions(board.size, board.moves):
         board_str = board_str[:marker_position] + mark + board_str[marker_position + 1:]
     board_str = board_str.replace('.', ' ').replace('\n', '\n\t\t')
-    return '\tmove {}: {}\n\t\t{}'.format(len(board.moves), board.moves[-1], board_str)
+    return '\tmove {}: {}\n\t\t{}'.format(len(board.moves), board.moves[-1] if board.moves else '', board_str)
 
 
 @printed
