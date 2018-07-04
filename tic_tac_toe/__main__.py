@@ -78,7 +78,7 @@ def main() -> str:
 
     args = parser.parse_args()
     strategies_folder = args.strategies_folder or os.path.join(os.path.dirname(__file__), 'strategies')
-    re_memorize_games(args.board_size)
+    # re_memorize_games(args.board_size)
     if args.tournament_type == 'fight':
         winners = play_tournament_eliminate(
             size=args.board_size,
