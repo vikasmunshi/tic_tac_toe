@@ -7,7 +7,7 @@ from .user_types import Board, Cell, Cells, Lines, Player, Players, Scores
 from .util import cached, select_random_cell
 
 __package__ = 'tic_tac_toe'
-__version__ = '1.5.1'
+__version__ = '1.6.1'
 memoize = cached
 __all__ = (
     'get_cells', 'get_lines', 'get_possible_moves', 'last_move_has_won', 'strategy',
