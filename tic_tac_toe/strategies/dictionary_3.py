@@ -18,6 +18,7 @@ base_board_3x3 = {
     'ia': 'cg', 'ib': 'e', 'ic': 'ag', 'id': 'e', 'ie': 'a', 'if': 'e', 'ig': 'ac', 'ih': 'e'
 }
 board_3x3 = {}
+board_size = 3
 
 
 @cached
@@ -41,9 +42,6 @@ def board_3x3_load() -> None:
             board_3x3.update(base_board_3x3)
     else:
         board_3x3 = dict(base_board_3x3)
-
-
-board_size = 3
 
 
 @cached
