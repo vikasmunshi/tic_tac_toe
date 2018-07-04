@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/strategies/ml.py
+import operator
+
 from tic_tac_toe import *
 
 
