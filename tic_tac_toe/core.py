@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #   tic_tac_toe/core.py
-from .game_graph import remembered_in_graph
-from .game_memory import remembered_in_memory
-from .game_nn import remembered_in_nn
-from .user_types import Board, Cell, Cells, Lines, Player
+from .user_types import Board, Cell, Cells, Game, Lines, Player
 from .util import cached, printed, select_random_cell
 from .visualize import show_board, show_game
 
@@ -26,11 +23,13 @@ def create_empty_board(size: int) -> Board:
 
 @show_board
 @cached
-@remembered_in_nn
-@remembered_in_graph
-@remembered_in_memory
 def check_winner(board: Board) -> str:
     return ('O', 'X')[len(board.moves) % 2] if last_move_has_won(board) else 'D' if board_is_full(board) else ''
+
+
+@cached
+def create_empty_board(size: int) -> Board:
+    return Board(size, ())
 
 
 @cached
@@ -54,13 +53,13 @@ def get_lines(board: Board) -> Lines:
 
 
 @cached
-def get_possible_moves(board: Board) -> Cells:
-    return tuple(cell for cell in get_cells(board) if cell not in board.moves)
+def get_moves_of_last_player(board: Board) -> Cells:
+    return board.moves[1 - len(board.moves) % 2::2]
 
 
 @cached
-def get_moves_of_last_player(board: Board) -> Cells:
-    return board.moves[1 - len(board.moves) % 2::2]
+def get_possible_moves(board: Board) -> Cells:
+    return tuple(cell for cell in get_cells(board) if cell not in board.moves)
 
 
 @cached
@@ -101,6 +100,13 @@ def play_game(size: int, one: Player, two: Player) -> str:
 
 def play_game_set(size: int, one: Player, two: Player) -> (str, str):
     return play_game(size, one, two), play_game(size, two, one)
+
+
+def reduce_board(board: Board) -> Game:
+    for subset_moves in (board.moves[0:n] for n in range(2 * board.size - 1, board.size * board.size + 1)):
+        if last_move_has_won(Board(board.size, subset_moves)):
+            return Game(moves=subset_moves, result=('O', 'X')[len(subset_moves) % 2])
+    return Game(moves=board.moves, result='D')
 
 
 def strategy(board: Board) -> Cell:
