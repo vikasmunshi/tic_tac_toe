@@ -49,4 +49,4 @@ def printed(func: TypeFunc, print_file: io.TextIOBase = sys.stderr) -> TypeFunc:
 
 
 def select_random_cell(cells: Cells) -> Cell:
-    return random.choice(cells) if cells else None
+    return random.choice(cells) if cells else ()
