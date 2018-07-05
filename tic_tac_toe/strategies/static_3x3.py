@@ -4803,4 +4803,4 @@ char_to_cell = {
 
 
 def strategy(board):
-    return char_to_cell[random.choice(board_to_move.get(''.join(cell_to_char[tuple(c)] for c in board.moves)))]
+    return char_to_cell[random.choice(board_to_move[''.join(cell_to_char[tuple(c)] for c in board.moves)])]
