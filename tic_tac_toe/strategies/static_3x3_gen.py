@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# tic_tac_toe/strategies/dictionary_3.py
+# tic_tac_toe/strategies/static_3x3_gen.py
 import atexit
 import collections
 import json
 import os.path
+import random
 import string
 
 from tic_tac_toe import *
 
 board_3x3 = {}
+board_3x3_base = {'': 'acgi',
+                  'a': 'e', 'b': 'ac', 'c': 'e', 'd': 'ag', 'e': 'acgi', 'f': 'ci', 'g': 'e', 'h': 'gi', 'i': 'e',
+                  'ab': 'e', 'ac': 'gi', 'ad': 'e', 'ae': 'i', 'af': 'e', 'ag': 'ci', 'ah': 'e', 'ai': 'cg',
+                  'ca': 'gi', 'cb': 'e', 'cd': 'e', 'ce': 'g', 'cf': 'e', 'cg': 'ai', 'ch': 'e', 'ci': 'ag',
+                  'ga': 'ci', 'gb': 'e', 'gc': 'ai', 'gd': 'e', 'ge': 'c', 'gf': 'e', 'gh': 'e', 'gi': 'ac',
+                  'ia': 'cg', 'ib': 'e', 'ic': 'ag', 'id': 'e', 'ie': 'a', 'if': 'e', 'ig': 'ac', 'ih': 'e'}
 board_size = 3
 
 
@@ -31,6 +38,7 @@ def board_3x3_load() -> None:
     if os.path.exists(fn):
         with open(fn) as infile:
             board_3x3 = json.load(infile)
+    board_3x3.update(board_3x3_base)
 
 
 @cached
@@ -82,7 +90,7 @@ def strategy(board: Board) -> Cell:
         board_3x3[board_str] = moves_str
         atexit.register(board_3x3_dump)
 
-    r = select_random_cell(chars_to_cells(moves_str))
+    r = random.choice(chars_to_cells(moves_str))
 
     new_board = Board(board.size, board.moves + (r,))
     if not last_move_has_won(new_board):

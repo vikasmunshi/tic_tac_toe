@@ -1,8 +1,10 @@
-#!/usr/bin/env python2.6
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # tic_tac_toe/strategies/static_3x3.py
 import random
 
+board_chars = 'abcdefghi'
+board_size = 3
 board_to_move = {
     '': 'acgi',
     'a': 'e',
@@ -4789,20 +4791,8 @@ board_to_move = {
     'ieahbcgf': 'd'
 }
 
-cell_to_char = {
-    (0, 0): 'a', (0, 1): 'b', (0, 2): 'c',
-    (1, 0): 'd', (1, 1): 'e', (1, 2): 'f',
-    (2, 0): 'g', (2, 1): 'h', (2, 2): 'i'
-}
 
-char_to_cell = {
-    'a': (0, 0), 'b': (0, 1), 'c': (0, 2),
-    'd': (1, 0), 'e': (1, 1), 'f': (1, 2),
-    'g': (2, 0), 'h': (2, 1), 'i': (2, 2)
-}
-
-
-def memoize(func):
+def cached(func):
     cache = {}
 
     def f(*args):
@@ -4813,10 +4803,25 @@ def memoize(func):
     return f
 
 
-@memoize
+@cached
+def cell_to_char(cell):
+    return board_chars[cell[1] + cell[0] * board_size]
+
+
+@cached
+def char_to_cell(char):
+    return char_to_int(char) // board_size, char_to_int(char) % board_size
+
+
+@cached
+def char_to_int(char):
+    return board_chars.index(char)
+
+
+@cached
 def moves_to_chars(moves):
-    return ''.join(cell_to_char[tuple(cell)] for cell in moves)
+    return ''.join(cell_to_char(tuple(cell)) for cell in moves)
 
 
 def strategy(board):
-    return char_to_cell[random.choice(board_to_move[moves_to_chars(board.moves)])]
+    return char_to_cell(random.choice(board_to_move[moves_to_chars(board.moves)]))
