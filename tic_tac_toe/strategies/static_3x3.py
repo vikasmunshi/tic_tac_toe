@@ -1,4 +1,9 @@
-{
+#!/usr/bin/env python2.6
+# -*- coding: utf-8 -*-
+# tic_tac_toe/strategies/static_3x3.py
+import random
+
+board_to_move = {
     "": "acgi",
     "a": "e",
     "b": "ac",
@@ -4783,3 +4788,19 @@
     "ieahbcgd": "f",
     "ieahbcgf": "d"
 }
+
+cell_to_char = {
+    (0, 0): 'a', (0, 1): 'b', (0, 2): 'c',
+    (1, 0): 'd', (1, 1): 'e', (1, 2): 'f',
+    (2, 0): 'g', (2, 1): 'h', (2, 2): 'i'
+}
+
+char_to_cell = {
+    'a': (0, 0), 'b': (0, 1), 'c': (0, 2),
+    'd': (1, 0), 'e': (1, 1), 'f': (1, 2),
+    'g': (2, 0), 'h': (2, 1), 'i': (2, 2)
+}
+
+
+def strategy(board):
+    return char_to_cell[random.choice(board_to_move.get(''.join(cell_to_char[tuple(c)] for c in board.moves)))]

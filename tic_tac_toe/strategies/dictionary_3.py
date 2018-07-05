@@ -25,7 +25,7 @@ board_size = 3
 def board_3x3_dump() -> None:
     with open(os.path.abspath(os.path.splitext(__file__)[0] + '.json'), 'w') as outfile:
         json.dump(
-            collections.OrderedDict(sorted(board_3x3.items(), key=lambda i: len(i[0]))),
+            collections.OrderedDict(sorted(board_3x3.items(), key=lambda i: (len(i[0]), i[0]))),
             outfile,
             indent=4,
             separators=(',', ': ')
@@ -82,9 +82,9 @@ def get_winning_moves(board) -> Cells:
 
 def strategy(board: Board) -> Cell:
     global board_3x3
-    board_str = cells_to_chars(board.moves)
+    board_str = cells_to_chars(tuple(Cell(*c) for c in board.moves))
     moves_str = board_3x3.get(board_str)
-    if moves_str is None:
+    if moves_str is None or moves_str == '':
         moves = get_winning_moves(board) or \
                 get_defensive_moves(board) or \
                 get_trap_moves(board) or \
