@@ -4802,5 +4802,21 @@ char_to_cell = {
 }
 
 
+def memoize(func):
+    cache = {}
+
+    def f(*args):
+        if args not in cache:
+            cache[args] = func(*args)
+        return cache[args]
+
+    return f
+
+
+@memoize
+def moves_to_chars(moves):
+    return ''.join(cell_to_char[tuple(cell)] for cell in moves)
+
+
 def strategy(board):
-    return char_to_cell[random.choice(board_to_move[''.join(cell_to_char[tuple(c)] for c in board.moves)])]
+    return char_to_cell[random.choice(board_to_move[moves_to_chars(board.moves)])]
