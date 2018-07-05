@@ -9,14 +9,6 @@ import string
 
 from tic_tac_toe import *
 
-base_board_3x3 = {
-    '': 'acgi',
-    'a': 'e', 'b': 'ac', 'c': 'e', 'd': 'ag', 'e': 'acgi', 'f': 'ci', 'g': 'e', 'h': 'gi', 'i': 'e',
-    'ab': 'e', 'ac': 'gi', 'ad': 'e', 'ae': 'i', 'af': 'e', 'ag': 'ci', 'ah': 'e', 'ai': 'cg',
-    'ca': 'gi', 'cb': 'e', 'cd': 'e', 'ce': 'g', 'cf': 'e', 'cg': 'ai', 'ch': 'e', 'ci': 'ag',
-    'ga': 'ci', 'gb': 'e', 'gc': 'ai', 'gd': 'e', 'ge': 'c', 'gf': 'e', 'gh': 'e', 'gi': 'ac',
-    'ia': 'cg', 'ib': 'e', 'ic': 'ag', 'id': 'e', 'ie': 'a', 'if': 'e', 'ig': 'ac', 'ih': 'e'
-}
 board_3x3 = {}
 board_size = 3
 
@@ -39,9 +31,6 @@ def board_3x3_load() -> None:
     if os.path.exists(fn):
         with open(fn) as infile:
             board_3x3 = json.load(infile)
-            board_3x3.update(base_board_3x3)
-    else:
-        board_3x3 = dict(base_board_3x3)
 
 
 @cached
