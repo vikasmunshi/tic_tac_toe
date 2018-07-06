@@ -1751,13 +1751,13 @@ def cached(func):
 
 
 @cached
-def char_to_cell(char):
-    return board_chars.index(char) // board_size, board_chars.index(char) % board_size
+def cells_to_chars(moves):
+    return ''.join(board_chars[cell[1] + cell[0] * board_size] for cell in moves)
 
 
 @cached
-def cells_to_chars(moves):
-    return ''.join(board_chars[cell[1] + cell[0] * board_size] for cell in moves)
+def char_to_cell(char):
+    return board_chars.index(char) // board_size, board_chars.index(char) % board_size
 
 
 @cached
