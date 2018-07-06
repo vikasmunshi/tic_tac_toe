@@ -1750,5 +1750,7 @@ def rotate(moves_str, turns):
 
 
 def strategy(board):
-    next_moves = board_to_move(rotate(cells_to_chars(board.moves), get_orientation(cells_to_chars(board.moves))))
-    return char_to_cell(rotate(random.choice(next_moves), - get_orientation(cells_to_chars(board.moves))))
+    board_moves = cells_to_chars(board.moves)
+    orientation = get_orientation(board_moves)
+    next_move = random.choice(board_to_move(rotate(board_moves, orientation)))
+    return char_to_cell(rotate(next_move, - orientation))
