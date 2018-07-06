@@ -96,8 +96,7 @@ def strategy(board: Board) -> Cell:
     if not last_move_has_won(new_board):
         if get_winning_moves(new_board):
             for k, m in ((board_str[:i], board_str[i]) for i in range(2 + (len(board_str) % 2), len(board_str), 2)):
-                if len(board_3x3[k]) > 1:
-                    board_3x3[k] = ''.join(c for c in board_3x3[k] if c != m)
+                board_3x3[k] = ''.join(c for c in board_3x3[k] if c != m)
             atexit.register(board_3x3_dump)
 
     return r
