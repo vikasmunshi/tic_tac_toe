@@ -9,6 +9,9 @@ import random
 
 from tic_tac_toe import *
 
+board_center_char = 'e'
+board_chars = 'abcdefghi'
+board_size = 3
 board_to_move = {}
 board_to_move_base = {
     '': 'acgi',
@@ -16,13 +19,10 @@ board_to_move_base = {
     "ab": "e", "ac": "gi", "ad": "e", "ae": "i", "af": "e", "ag": "ci", "ah": "e", "ai": "cg",
     "ca": "gi", "cb": "e", "cd": "e", "ce": "g", "cf": "e", "cg": "ai", "ch": "e", "ci": "ag",
 }
-board_center_char = 'e'
-board_chars = 'abcdefghi'
-board_size = 3
 
 
 @cached
-def board_3x3_dump() -> None:
+def board_to_move_dump() -> None:
     with open(os.path.abspath(os.path.splitext(__file__)[0] + '.json'), 'w') as outfile:
         json.dump(
             collections.OrderedDict(sorted(board_to_move.items(), key=lambda i: (len(i[0]), i[0]))),
@@ -33,7 +33,7 @@ def board_3x3_dump() -> None:
 
 
 @cached
-def board_3x3_load() -> None:
+def board_to_move_load() -> None:
     global board_to_move
     fn = os.path.abspath(os.path.splitext(__file__)[0] + '.json')
     if os.path.exists(fn):
@@ -43,18 +43,13 @@ def board_3x3_load() -> None:
 
 
 @cached
-def cells_to_chars(moves):
-    return ''.join(board_chars[cell[1] + cell[0] * board_size] for cell in moves)
+def cells_to_chars(cells):
+    return ''.join(board_chars[cell[1] + cell[0] * board_size] for cell in cells)
 
 
 @cached
-def char_to_cell(char: str) -> Cell:
-    return Cell(board_chars.index(char) // board_size, board_chars.index(char) % board_size)
-
-
-@cached
-def chars_to_cells(chars: str) -> Cells:
-    return tuple(char_to_cell(c) for c in chars) if chars else ()
+def char_to_cell(cell_str: str) -> Cell:
+    return Cell(board_chars.index(cell_str) // board_size, board_chars.index(cell_str) % board_size)
 
 
 @cached
@@ -64,10 +59,12 @@ def get_defensive_moves(board: Board) -> Cells:
 
 @cached
 def get_orientation(moves_str):
-    return 0 if len(moves_str) == 0 or (len(moves_str) == 1 and moves_str[0] == board_center_char) else \
-        {
+    if len(moves_str) == 0 or (len(moves_str) == 1 and moves_str[0] == board_center_char):
+        return 0
+    else:
+        return {
             'a': 0, 'b': 0, 'c': 0, 'd': 3, 'f': 1, 'g': 3, 'h': 2, 'i': 1
-        }[moves_str[0] if moves_str[0] != board_center_char else moves_str[1]]
+        }[moves_str[1] if moves_str[0] == board_center_char else moves_str[0]]
 
 
 @cached
@@ -102,19 +99,19 @@ def strategy(board: Board) -> Cell:
                 get_trap_moves(board) or \
                 get_possible_moves(board)
         moves_str = rotate(cells_to_chars(moves), orientation)
-        board_to_move[board_str] = moves_str
-        atexit.register(board_3x3_dump)
+        board_to_move[board_str] = ''.join(sorted(moves_str))
+        atexit.register(board_to_move_dump)
 
-    r = random.choice(chars_to_cells(rotate(moves_str, -orientation)))
+    move = char_to_cell(rotate(random.choice(moves_str), -orientation))
 
-    new_board = Board(board.size, board.moves + (r,))
+    new_board = Board(board.size, board.moves + (move,))
     if not last_move_has_won(new_board):
         if get_winning_moves(new_board):
             for k, m in ((board_str[:i], board_str[i]) for i in range(2 + (len(board_str) % 2), len(board_str), 2)):
                 board_to_move[k] = ''.join(c for c in board_to_move[k] if c != m)
-            atexit.register(board_3x3_dump)
+            atexit.register(board_to_move_dump)
 
-    return r
+    return move
 
 
-board_3x3_load()
+board_to_move_load()
