@@ -11,12 +11,7 @@ import string
 from tic_tac_toe import *
 
 board_3x3 = {}
-board_3x3_base = {'': 'acgi',
-                  'a': 'e', 'b': 'ac', 'c': 'e', 'd': 'ag', 'e': 'acgi', 'f': 'ci', 'g': 'e', 'h': 'gi', 'i': 'e',
-                  'ab': 'e', 'ac': 'gi', 'ad': 'e', 'ae': 'i', 'af': 'e', 'ag': 'ci', 'ah': 'e', 'ai': 'cg',
-                  'ca': 'gi', 'cb': 'e', 'cd': 'e', 'ce': 'g', 'cf': 'e', 'cg': 'ai', 'ch': 'e', 'ci': 'ag',
-                  'ga': 'ci', 'gb': 'e', 'gc': 'ai', 'gd': 'e', 'ge': 'c', 'gf': 'e', 'gh': 'e', 'gi': 'ac',
-                  'ia': 'cg', 'ib': 'e', 'ic': 'ag', 'id': 'e', 'ie': 'a', 'if': 'e', 'ig': 'ac', 'ih': 'e'}
+board_3x3_base = {'': 'acgi', 'a': 'e', 'b': 'ac', 'c': 'e', 'd': 'ag', 'e': 'acgi', 'f': 'ci', 'g': 'e', 'h': 'gi', 'i': 'e'}
 board_size = 3
 
 
@@ -95,7 +90,7 @@ def strategy(board: Board) -> Cell:
     new_board = Board(board.size, board.moves + (r,))
     if not last_move_has_won(new_board):
         if get_winning_moves(new_board):
-            for k, m in ((board_str[:i], board_str[i]) for i in range(2 + (len(board_str) % 2), len(board_str), 2)):
+            for k, m in ((board_str[:i], board_str[i]) for i in range(2 - (len(board_str) % 2), len(board_str), 2)):
                 board_3x3[k] = ''.join(c for c in board_3x3[k] if c != m)
             atexit.register(board_3x3_dump)
 
