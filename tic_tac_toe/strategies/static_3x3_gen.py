@@ -4,6 +4,7 @@
 import atexit
 import collections
 import json
+import operator
 import os.path
 import random
 
@@ -25,7 +26,7 @@ board_to_move_base = {
 def board_to_move_dump() -> None:
     with open(os.path.abspath(os.path.splitext(__file__)[0] + '.json'), 'w') as outfile:
         json.dump(
-            collections.OrderedDict(sorted(board_to_move.items(), key=lambda i: (len(i[0]), i[0]))),
+            collections.OrderedDict(sorted(board_to_move.items(), key=operator.itemgetter(0))),
             outfile,
             indent=4,
             separators=(',', ': ')
