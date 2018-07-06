@@ -6,12 +6,13 @@ import collections
 import json
 import os.path
 import random
-import string
 
 from tic_tac_toe import *
 
 board_3x3 = {}
-board_3x3_base = {'': 'acgi', 'a': 'e', 'b': 'ac', 'c': 'e', 'd': 'ag', 'e': 'acgi', 'f': 'ci', 'g': 'e', 'h': 'gi', 'i': 'e'}
+board_3x3_base = {'': 'acgi',
+                  'a': 'e', 'b': 'ac', 'c': 'e', 'd': 'ag', 'e': 'acgi', 'f': 'ci', 'g': 'e', 'h': 'gi', 'i': 'e'}
+board_chars = 'abcdefghi'
 board_size = 3
 
 
@@ -37,23 +38,18 @@ def board_3x3_load() -> None:
 
 
 @cached
-def cells_to_chars(cells: Cells) -> str:
-    return ''.join(string.ascii_lowercase[cell.col_id + cell.row_id * board_size] for cell in cells) if cells else ''
+def cells_to_chars(moves):
+    return ''.join(board_chars[cell[1] + cell[0] * board_size] for cell in moves)
 
 
 @cached
 def char_to_cell(char: str) -> Cell:
-    return Cell(row_id=char_to_cell_num(char) // board_size, col_id=char_to_cell_num(char) % board_size) if char else ()
-
-
-@cached
-def char_to_cell_num(char: str) -> int:
-    return string.ascii_lowercase.index(char)
+    return Cell(board_chars.index(char) // board_size, board_chars.index(char) % board_size)
 
 
 @cached
 def chars_to_cells(chars: str) -> Cells:
-    return tuple(char_to_cell(c) for c in chars) if chars else ''
+    return tuple(char_to_cell(c) for c in chars) if chars else ()
 
 
 @cached
