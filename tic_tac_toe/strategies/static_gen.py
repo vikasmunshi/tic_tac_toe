@@ -129,13 +129,6 @@ def strategy(board: Board) -> Cell:
     new_board = Board(board.size, board.moves + (move,))
     if not last_move_has_won(new_board):
         if get_winning_moves(new_board):
-            print('board_str_orig',board_str_orig)
-            print('board_str', board_str)
-            print('orientation', orientation)
-            print('moves_str', moves_str)
-            print('board_orientation_map', board_orientation_map)
-            print('board_rotation_maps', board_rotation_maps)
-            input('Check this')
             for k, m in ((board_str[:i], board_str[i]) for i in range(2 + (len(board_str) % 2), len(board_str), 2)):
                 board_to_move[k] = ''.join(c for c in board_to_move[k] if c != m)
             atexit.register(dump_board_to_move, board.size)
