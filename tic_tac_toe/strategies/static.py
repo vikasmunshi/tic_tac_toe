@@ -6,82 +6,128 @@ import os.path
 import random
 import string
 
-board_center_char = ''
-board_chars = ''
-board_orientation_map = {}
-board_rotation_maps = ()
-board_size = 0
+from tic_tac_toe import Board, Cell
 
 
-def board_to_move(moves_str):
-    return {}[moves_str]
-
-
-def cached(func):
+def cached(func: callable) -> callable:
     cache = {}
 
     def f(*args):
-        if args not in cache:
-            cache[args] = func(*args)
+        if args not in cache: cache[args] = func(*args)
         return cache[args]
 
     return f
 
 
 @cached
-def cells_to_chars(moves):
-    return ''.join(board_chars[cell[1] + cell[0] * board_size] for cell in moves)
+def cells_to_chars(board: Board) -> str:
+    return ''.join(get_board_chars(board.size)[cell[1] + cell[0] * board.size] for cell in board.moves)
 
 
 @cached
-def char_to_cell(char):
-    return board_chars.index(char) // board_size, board_chars.index(char) % board_size
+def char_to_cell(size: int, move: str) -> (int, int):
+    return get_board_chars(size).index(move) // size, get_board_chars(size).index(move) % size
 
 
 @cached
-def get_orientation(moves_str):
-    return 0 if len(moves_str) == 0 or (len(moves_str) == 1 and moves_str[0] == board_center_char) else \
-        board_orientation_map[moves_str[1] if moves_str[0] == board_center_char else moves_str[0]]
+def get_board_center_char(size: int) -> str:
+    return '' if size % 2 == 0 else string.ascii_lowercase[(size * size) // 2]
 
 
 @cached
-def load_board_to_move(size: int) -> None:
-    global board_to_move
-    fn = os.path.abspath(os.path.splitext(__file__)[0] + '_gen_{0}x{0}.json'.format(size))
-    if os.path.exists(fn):
-        with open(fn) as infile:
-            board_to_move_dict = json.load(infile)
-        board_to_move = lambda moves_str: board_to_move_dict[moves_str]
+def get_board_chars(size: int) -> str:
+    return string.ascii_lowercase[:size * size]
 
 
 @cached
-def rotate(moves_str, turns):
-    return ''.join(board_rotation_maps[turns % 4][c] for c in moves_str) if moves_str else ''
+def get_board_lines(size: int) -> (str, ...):
+    return tuple(get_rotated_boards(size)[0][i::size] for i in range(size)) + \
+           tuple(get_rotated_boards(size)[3][i::size] for i in range(size)) + \
+           (''.join(get_rotated_boards(size)[0][i * size + i] for i in range(size)),) + \
+           (''.join(get_rotated_boards(size)[1][i * size + i] for i in range(size)),)
 
 
 @cached
-def setup_board(size: int) -> None:
-    global board_center_char, board_chars, board_orientation_map, board_rotation_maps, board_size
-    board_center_char = '' if size % 2 == 0 else string.ascii_lowercase[(size * size) // 2]
-    board_chars = string.ascii_lowercase[:size * size]
-    rotated_boards = (board_chars,)
+def get_board_orientation_map(size: int) -> {str: int}:
+    return {
+        c: 0 if c in get_rotated_boards(size)[0][:size * (size // 2)]
+        else 1 if c in get_rotated_boards(size)[1][:size * (size // 2)]
+        else 2 if c in get_rotated_boards(size)[2][:size * (size // 2)]
+        else 3 if c in get_rotated_boards(size)[3][:size * (size // 2)]
+        else 0
+        for c in get_board_chars(size)}
+
+
+@cached
+def get_board_rotation_maps(size: int) -> (str, str, str, str):
+    return tuple(dict(zip(get_rotated_boards(size)[i], get_board_chars(size))) for i in range(4))
+
+
+@cached
+def get_defensive_moves(size: int, board: str) -> str:
+    return ''.join(c for c in get_possible_moves(size, board) if last_move_has_won(size, board + c))
+
+
+@cached
+def get_orientation(size: int, board: str) -> int:
+    return 0 if len(board) == 0 or (len(board) == 1 and board[0] == get_board_center_char(size)) else \
+        get_board_orientation_map(size)[board[1] if board[0] == get_board_center_char(size) else board[0]]
+
+
+@cached
+def get_possible_moves(size: int, board: str) -> str:
+    return ''.join(c for c in get_board_chars(size) if c not in board)
+
+
+@cached
+def get_rotated_boards(size) -> (str, str, str, str):
+    rotated_boards = (get_board_chars(size),)
     for _ in range(3):
         rotated_boards += (''.join(rotated_boards[-1][i % size::size] for i in range(-1, -size - 1, -1)),)
-    board_orientation_map = {
-        c: 0 if c in rotated_boards[0][:size * (size // 2)]
-        else 1 if c in rotated_boards[1][:size * (size // 2)]
-        else 2 if c in rotated_boards[2][:size * (size // 2)]
-        else 3 if c in rotated_boards[3][:size * (size // 2)]
-        else 0
-        for c in board_chars}
-    board_rotation_maps = tuple(dict(zip(rotated_boards[i], board_chars)) for i in range(4))
-    board_size = size
-    load_board_to_move(size)
+    return rotated_boards
 
 
-def strategy(board):
-    setup_board(board.size)
-    board_moves = cells_to_chars(board.moves)
-    orientation = get_orientation(board_moves)
-    next_move = random.choice(board_to_move(rotate(board_moves, orientation)))
-    return char_to_cell(rotate(next_move, - orientation))
+@cached
+def get_trap_moves(size: int, board: str) -> str:
+    return ''.join(c for c in get_possible_moves(size, board) if len(get_winning_moves(size, board + c + ' ')) > 1)
+
+
+@cached
+def get_winning_moves(size: int, board: str) -> str:
+    return ''.join(c for c in get_possible_moves(size, board) if last_move_has_won(size, board + c))
+
+
+@cached
+def last_move_has_won(size: int, board: str) -> bool:
+    return any([all([c in board[1 - len(board) % 2::2] for c in l]) for l in get_board_lines(size)])
+
+
+@cached
+def rotate(board_size: int, moves_str: str, turns: int) -> str:
+    return ''.join(get_board_rotation_maps(board_size)[turns % 4][c] for c in moves_str) if moves_str else ''
+
+
+@cached
+def get_board_to_move_func(board_size: int) -> callable:
+    try:
+        with open(os.path.abspath(os.path.splitext(__file__)[0] + '_gen_{0}x{0}.json'.format(board_size))) as infile:
+            board_to_move_dict = json.load(infile)
+    except (FileNotFoundError,):
+        board_to_move_dict = {}
+
+    def f(moves_str: str) -> str:
+        if moves_str not in board_to_move_dict:
+            board_to_move_dict[moves_str] = get_winning_moves(board_size, moves_str) or \
+                                            get_defensive_moves(board_size, moves_str) or \
+                                            get_trap_moves(board_size, moves_str) or \
+                                            get_possible_moves(board_size, moves_str)
+        return board_to_move_dict[moves_str]
+
+    return f
+
+
+def strategy(board: Board) -> Cell:
+    moves = cells_to_chars(board)
+    orientation = get_orientation(board.size, moves)
+    next_move = random.choice(get_board_to_move_func(board.size)(rotate(board.size, moves, orientation)))
+    return char_to_cell(board.size, rotate(board.size, next_move, - orientation))
