@@ -13,7 +13,8 @@ def cached(func: callable) -> callable:
     cache = {}
 
     def f(*args):
-        if args not in cache: cache[args] = func(*args)
+        if args not in cache:
+            cache[args] = func(*args)
         return cache[args]
 
     return f
@@ -40,14 +41,6 @@ def get_board_chars(size: int) -> str:
 
 
 @cached
-def get_board_lines(size: int) -> (str, ...):
-    return tuple(get_rotated_boards(size)[0][i::size] for i in range(size)) + \
-           tuple(get_rotated_boards(size)[3][i::size] for i in range(size)) + \
-           (''.join(get_rotated_boards(size)[0][i * size + i] for i in range(size)),) + \
-           (''.join(get_rotated_boards(size)[1][i * size + i] for i in range(size)),)
-
-
-@cached
 def get_board_orientation_map(size: int) -> {str: int}:
     return {
         c: 0 if c in get_rotated_boards(size)[0][:size * (size // 2)]
@@ -61,11 +54,6 @@ def get_board_orientation_map(size: int) -> {str: int}:
 @cached
 def get_board_rotation_maps(size: int) -> (str, str, str, str):
     return tuple(dict(zip(get_rotated_boards(size)[i], get_board_chars(size))) for i in range(4))
-
-
-@cached
-def get_defensive_moves(size: int, board: str) -> str:
-    return ''.join(c for c in get_possible_moves(size, board) if last_move_has_won(size, board + c))
 
 
 @cached
@@ -88,21 +76,6 @@ def get_rotated_boards(size) -> (str, str, str, str):
 
 
 @cached
-def get_trap_moves(size: int, board: str) -> str:
-    return ''.join(c for c in get_possible_moves(size, board) if len(get_winning_moves(size, board + c + ' ')) > 1)
-
-
-@cached
-def get_winning_moves(size: int, board: str) -> str:
-    return ''.join(c for c in get_possible_moves(size, board) if last_move_has_won(size, board + c))
-
-
-@cached
-def last_move_has_won(size: int, board: str) -> bool:
-    return any([all([c in board[1 - len(board) % 2::2] for c in l]) for l in get_board_lines(size)])
-
-
-@cached
 def rotate(board_size: int, moves_str: str, turns: int) -> str:
     return ''.join(get_board_rotation_maps(board_size)[turns % 4][c] for c in moves_str) if moves_str else ''
 
@@ -116,12 +89,7 @@ def get_board_to_move_func(board_size: int) -> callable:
         board_to_move_dict = {}
 
     def f(moves_str: str) -> str:
-        if moves_str not in board_to_move_dict:
-            board_to_move_dict[moves_str] = get_winning_moves(board_size, moves_str) or \
-                                            get_defensive_moves(board_size, moves_str) or \
-                                            get_trap_moves(board_size, moves_str) or \
-                                            get_possible_moves(board_size, moves_str)
-        return board_to_move_dict[moves_str]
+        return board_to_move_dict.get(moves_str) or get_possible_moves(board_size, moves_str)
 
     return f
 
