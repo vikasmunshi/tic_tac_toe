@@ -12,7 +12,7 @@ setup(
     description='Tic Tac Toe Tournament',
     packages=['tic_tac_toe', 'tic_tac_toe.strategies'],
     package_dir={'tic_tac_toe': 'tic_tac_toe'},
-    install_requires=['numpy >= 1.14', 'termcolor >= 1.1', 'scipy >= 1.1'],
+    install_requires=['numpy >= 1.14', 'scipy >= 1.1'],
     license='MIT License',
     platforms=['any'],
     long_description=open('README.md').read()
