@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # tic_tac_toe/strategies/static.py
+import atexit
+import collections
 import json
+import operator
 import os.path
 import random
 import string
@@ -54,8 +57,14 @@ def get_board_rotation_maps(size: int) -> (str, str, str, str):
 
 
 @cached
+def get_corner_cells(size: int) -> str:
+    return ''.join(b[0] for b in get_rotated_boards(size))
+
+
+@cached
 def get_defensive_moves(board_size: int, moves_str: str) -> str:
-    return ''.join(c for c in get_possible_moves(board_size, moves_str) if last_move_has_won(board_size, moves_str + c))
+    return ''.join(c for c in get_possible_moves(board_size, moves_str)
+                   if last_move_has_won(board_size, moves_str + ' ' + c))
 
 
 @cached
@@ -99,25 +108,62 @@ def rotate(board_size: int, moves_str: str, turns: int) -> str:
 
 
 @cached
-def sized_board_to_move_func(board_size: int) -> callable:
+def setup_func(board_size: int) -> (callable, callable, callable):
+    fn = os.path.abspath(os.path.splitext(__file__)[0] + '_{0}x{0}.json'.format(board_size))
     try:
-        with open(os.path.abspath(os.path.splitext(__file__)[0] + '_{0}x{0}.json'.format(board_size))) as infile:
-            board_to_move_dict = json.load(infile)
+        with open(fn) as infile:
+            cache = json.load(infile)
     except (FileNotFoundError,):
-        board_to_move_dict = {}
+        cache = {
+            '': 'acgi',
+            'a': 'e', 'b': 'ac', 'c': 'e', 'e': 'acgi',
+            'ab': 'e', 'ac': 'gi', 'ad': 'e', 'ae': 'i', 'af': 'e', 'ag': 'ci', 'ah': 'e', 'ai': 'cg',
+            'ca': 'gi', 'cb': 'e', 'cd': 'e', 'ce': 'g', 'cf': 'e', 'cg': 'ai', 'ch': 'e', 'ci': 'ag'
+        } if board_size == 3 else {}
 
-    def f(moves_str: str) -> str:
-        return board_to_move_dict.get(moves_str) or \
-               get_winning_moves(board_size, moves_str) or \
-               get_defensive_moves(board_size, moves_str) or \
-               get_trap_moves(board_size, moves_str) or \
-               get_possible_moves(board_size, moves_str)
+    def dump() -> None:
+        with open(fn, 'w') as outfile:
+            json.dump(
+                collections.OrderedDict(sorted(((k, ''.join(sorted(v)))
+                                                for k, v in cache.items()), key=operator.itemgetter(0))),
+                outfile,
+                indent=4,
+                separators=(',', ': ')
+            )
 
-    return f
+    def get_moves(board_str: str) -> str:
+        return cache.get(board_str, '')
+
+    def put_moves(board_str: str, moves_str: str) -> None:
+        cache[board_str] = moves_str
+        atexit.unregister(dump)
+        atexit.register(dump)
+
+    def del_moves(loosing_board: str) -> None:
+        for k, m in ((loosing_board[:i], loosing_board[i])
+                     for i in range((2 if board_size == 3 else 0) + (len(loosing_board) % 2), len(loosing_board), 2)):
+            cache[k] = cache[k].replace(m, '')
+        atexit.unregister(dump)
+        atexit.register(dump)
+
+    return get_moves, put_moves, del_moves
 
 
 def strategy(board: Board) -> Cell:
-    moves = cells_to_chars(board.size, board.moves)
-    orientation = get_orientation(board.size, moves)
-    next_move = random.choice(sized_board_to_move_func(board.size)(rotate(board.size, moves, orientation)))
-    return Cell(*char_to_cell(board.size, rotate(board.size, next_move, - orientation)))
+    get_moves, put_moves, del_moves = setup_func(board.size)
+    moves_orig = cells_to_chars(board.size, board.moves)
+    orientation = get_orientation(board.size, moves_orig)
+    moves = rotate(board.size, moves_orig, orientation)
+    next_moves = get_moves(moves)
+    if next_moves == '':
+        next_moves = get_winning_moves(board.size, moves) or \
+                     get_defensive_moves(board.size, moves) or \
+                     get_trap_moves(board.size, moves) or \
+                     get_possible_moves(board.size, moves)
+        put_moves(moves, next_moves)
+
+    for new_board in (moves + m for m in next_moves):
+        if not (last_move_has_won(board.size, new_board) or get_winning_moves(board.size, new_board) == ''):
+            del_moves(moves)
+
+    return Cell(*char_to_cell(board.size, rotate(board.size, random.choice(next_moves), - orientation)))
