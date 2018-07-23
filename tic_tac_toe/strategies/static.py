@@ -107,7 +107,7 @@ def rotate(board_size: int, moves_str: str, turns: int) -> str:
 
 
 @cached
-def setup_func(board_size: int) -> (callable, callable, callable):
+def setup_func(board_size: int) -> (callable, callable, callable, callable):
     fn = os.path.abspath(os.path.splitext(__file__)[0] + '_{0}x{0}.json'.format(board_size))
     try:
         with open(fn) as infile:
