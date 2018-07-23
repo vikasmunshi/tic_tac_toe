@@ -4,7 +4,6 @@
 import atexit
 import collections
 import json
-import operator
 import os.path
 import random
 import string
@@ -113,7 +112,7 @@ def setup_func(board_size: int) -> (callable, callable, callable):
     try:
         with open(fn) as infile:
             cache = json.load(infile)
-    except (FileNotFoundError,):
+    except (FileNotFoundError, json.JSONDecodeError):
         cache = {
             '': 'acgi',
             'a': 'e', 'b': 'ac', 'c': 'e', 'e': 'acgi',
@@ -122,22 +121,22 @@ def setup_func(board_size: int) -> (callable, callable, callable):
         } if board_size == 3 else {}
 
     def dump() -> None:
-        with open(fn, 'w') as outfile:
-            json.dump(
-                collections.OrderedDict(sorted(((k, ''.join(sorted(v)))
-                                                for k, v in cache.items()), key=operator.itemgetter(0))),
-                outfile,
-                indent=4,
-                separators=(',', ': ')
-            )
+        with open(fn, 'w') as out:
+            json.dump(collections.OrderedDict(sorted(cache.items(), key=lambda x: (len(x[0]), x[0]))), out, indent=2)
 
     def get_moves(board_str: str) -> str:
         return cache.get(board_str, '')
 
     def put_moves(board_str: str, moves_str: str) -> None:
-        cache[board_str] = moves_str
+        cache[board_str] = ''.join(sorted(moves_str))
         atexit.unregister(dump)
         atexit.register(dump)
+
+    def put_result(board_str: str, result: str) -> None:
+        if board_str not in cache:
+            cache[board_str] = result
+            atexit.unregister(dump)
+            atexit.register(dump)
 
     def del_moves(loosing_board: str) -> None:
         for k, m in ((loosing_board[:i], loosing_board[i])
@@ -146,11 +145,11 @@ def setup_func(board_size: int) -> (callable, callable, callable):
         atexit.unregister(dump)
         atexit.register(dump)
 
-    return get_moves, put_moves, del_moves
+    return get_moves, put_moves, del_moves, put_result
 
 
 def strategy(board: Board) -> Cell:
-    get_moves, put_moves, del_moves = setup_func(board.size)
+    get_moves, put_moves, del_moves, put_result = setup_func(board.size)
     moves_orig = cells_to_chars(board.size, board.moves)
     orientation = get_orientation(board.size, moves_orig)
     moves = rotate(board.size, moves_orig, orientation)
@@ -163,7 +162,11 @@ def strategy(board: Board) -> Cell:
         put_moves(moves, next_moves)
 
     for new_board in (moves + m for m in next_moves):
-        if not (last_move_has_won(board.size, new_board) or get_winning_moves(board.size, new_board) == ''):
+        if last_move_has_won(board.size, new_board):
+            put_result(new_board, ('O', 'X')[len(new_board) % 2])
+        elif len(new_board) == board.size ** 2:
+            put_result(new_board, 'D')
+        elif get_winning_moves(board.size, new_board) != '':
             del_moves(moves)
 
     return Cell(*char_to_cell(board.size, rotate(board.size, random.choice(next_moves), - orientation)))
