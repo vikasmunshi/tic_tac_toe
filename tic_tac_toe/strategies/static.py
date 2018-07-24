@@ -120,6 +120,7 @@ def setup_func(board_size: int) -> (callable, callable, callable, callable):
             'ca': 'gi', 'cb': 'e', 'cd': 'e', 'ce': 'g', 'cf': 'e', 'cg': 'ai', 'ch': 'e', 'ci': 'ag'
         } if board_size == 3 else {}
 
+    @cached
     def dump() -> None:
         with open(fn, 'w') as out:
             json.dump(collections.OrderedDict(sorted(cache.items(), key=lambda x: (len(x[0]), x[0]))), out, indent=2)
